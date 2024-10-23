@@ -6,14 +6,21 @@
 -- returned when the module is called with `require`.
 local M = {}
 
--- Helper function to read the output of a command
-local function execute_command(cmd)
-    local handle = io.popen(cmd)
-    if handle == nil then
-        return nil, "Failed to execute command: " .. cmd
-    end
-    local result = handle:read("*a")
+-- Helper function to run Python script with the JSON input
+local function run_python_script(json_data)
+    -- Specify the path to your Python script
+    local python_script_path = "../../src/__init__.py"
+
+    -- Open a process to run the Python script
+    local python_cmd = "python3 " .. python_script_path
+    local handle = assert(io.popen(python_cmd, "w")) -- Open with write mode to pass data
+
+    -- Write the JSON data to the Python script's standard input
+    handle:write(json_data)
     handle:close()
+
+    -- Capture the Python script output
+    local result = handle:read("*a")
     return result
 end
 
@@ -22,15 +29,14 @@ function M.show_graph()
     -- Run `zk graph --format=json` and capture the output
     local zk_graph_output = execute_command("zk graph --format=json")
 
-    -- Pass the JSON output to the Python script and capture its output
-    local python_script_path = "../../src/__init__.py"
-    local python_command = "python3 " .. python_script_path
-    local file = execute_command("echo '" .. zk_graph_output .. "' | " .. python_command)
+    -- Pass the JSON output to the Python script
+    local file = run_python_script(zk_graph_output)
 
     -- Check if a file was returned by the Python script
     if file and file ~= "" then
         -- Remove any trailing newline characters
         file = file:gsub("%s+$", "")
+
         -- Get ZK_NOTEBOOK_DIR from the environment variable
         local zk_notebook_dir = os.getenv("ZK_NOTEBOOK_DIR")
 
