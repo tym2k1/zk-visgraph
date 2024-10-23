@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import gi
+import io
 import webview
 from pyvis.network import Network
 from collections import defaultdict
@@ -76,9 +77,8 @@ custom_js = """
 # Embed the custom JavaScript in the HTML
 net_html = net_html.replace("</body>", custom_js + "</body>")
 
-# Save the modified HTML to a file
-with open("net.html", "w") as file:
-    file.write(net_html)
+# Use io.StringIO to handle HTML in memory
+html_io = io.StringIO(net_html)
 
-webview.create_window('My App', "./net.html", js_api=api)
+webview.create_window('My App', html=html_io.getvalue(), js_api=api)
 webview.start()
