@@ -64,7 +64,8 @@ end
 function M.show_graph()
     -- Run `zk graph --format=json` and capture the output synchronously
     local function execute_command(cmd)
-        local handle = io.popen(cmd)
+      -- Redirect stderr to /dev/null as `zk` outputs the `Found * notes` to stderr
+      local handle = io.popen(cmd .. " 2>/dev/null")
         if not handle then
             return nil, "Error: Unable to execute command: " .. cmd
         end
@@ -73,7 +74,7 @@ function M.show_graph()
         return result
     end
 
-    local zk_graph_output = execute_command("zk graph --format=json")
+    local zk_graph_output = execute_command("zk graph --format=json --quiet")
 
     -- Run the Python script asynchronously and wait for the output
     run_python_script_async(zk_graph_output, function(file, err)
