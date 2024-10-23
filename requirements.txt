@@ -1,0 +1,5 @@
+pyvis
+pywebview[qt]
+PySide2
+qtpy
+pyside2
