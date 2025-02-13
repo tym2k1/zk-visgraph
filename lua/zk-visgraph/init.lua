@@ -25,9 +25,9 @@ local function run_python_script_async(json_data, callback)
     },
     function(code)
         -- Process exit, close the handles
-        stdout:close()
-        stderr:close()
-        stdin:close()
+        -- stdout:close()
+        -- stderr:close()
+        -- stdin:close()
 
         -- Invoke the callback with the result if successful
         if code == 0 then
@@ -96,7 +96,9 @@ function M.show_graph()
                 local full_file_path = zk_notebook_dir .. "/" .. file
 
                 -- Open the file in Neovim
-                vim.api.nvim_command("edit " .. full_file_path)
+                vim.schedule(function()
+                    vim.api.nvim_command("edit " .. full_file_path)
+                end)
             else
                 print("ZK_NOTEBOOK_DIR is not set or is empty.")
             end
