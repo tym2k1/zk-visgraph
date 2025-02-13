@@ -5,8 +5,9 @@ local M = {}
 
 -- Helper function to run a command asynchronously and capture output
 local function run_python_script_async(json_data, callback)
-    -- Specify the path to your Python script
-    local python_script_path = "../../src/__init__.py"
+    -- Get the directory of the currently executing Lua script
+    local plugin_path = debug.getinfo(1).source:match("@(.*/)")
+    local python_script_path = plugin_path .. "../../src/__init__.py"
     local python_cmd = {"python3", python_script_path}
 
     -- Create a pipe for stdin to pass the JSON data
