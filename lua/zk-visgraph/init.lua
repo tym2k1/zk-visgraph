@@ -63,6 +63,18 @@ end
 
 -- Show graph and open the file in Vim if one is returned
 function M.show_graph()
+    -- Show initial loading message
+    local counter = 0
+    local loading = true  -- Flag to control loading animation
+
+    -- Function to update the loading message
+    local function update_loading_message()
+        if not loading then return end  -- Stop updating if process is done
+        counter = counter + 1
+        vim.api.nvim_out_write("Loading Graph" .. string.rep(".", counter % 3))
+        vim.defer_fn(update_loading_message, 1000)  -- Schedule next update
+    end
+
     -- Run `zk graph --format=json` and capture the output synchronously
     local function execute_command(cmd)
       -- Redirect stderr to /dev/null as `zk` outputs the `Found * notes` to stderr
@@ -75,10 +87,17 @@ function M.show_graph()
         return result
     end
 
+    update_loading_message()
     local zk_graph_output = execute_command("zk graph --format=json --quiet")
 
     -- Run the Python script asynchronously and wait for the output
     run_python_script_async(zk_graph_output, function(file, err)
+        -- Stop the loading indicator
+        loading = false
+
+        -- Clear the loading message and print "Done"
+        vim.api.nvim_out_write("Done loading graph.")
+
         if err then
             print(err)
             return
