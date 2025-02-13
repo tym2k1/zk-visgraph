@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#! /usr/bin/env nix-shell
+#! nix-shell -i python3 -p python312Full python312Packages.pyvis python312Packages.pywebview python312Packages.qtpy python312Packages.pyside2 python312Packages.pygobject3 python312Packages.typing-extensions gtk3 glib webkitgtk
 
 import os
 import sys
